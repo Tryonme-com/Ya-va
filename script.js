@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Button click handlers
     const tryNowBtn = document.querySelector('.btn-primary');
     const learnMoreBtn = document.querySelector('.btn-secondary');
+    const getAllInfoBtn = document.querySelector('.btn-info');
 
     if (tryNowBtn) {
         tryNowBtn.addEventListener('click', function() {
@@ -41,6 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     behavior: 'smooth'
                 });
             }
+        });
+    }
+
+    if (getAllInfoBtn) {
+        getAllInfoBtn.addEventListener('click', function() {
+            displayAllInfo();
         });
     }
 
@@ -124,6 +131,203 @@ document.addEventListener('DOMContentLoaded', function() {
     // Console welcome message
     console.log('Welcome to TryOnYou! 👔✨');
     console.log('Virtual try-on technology powered by Ya-va');
+
+    // Extract all website information function
+    function getAllWebsiteInfo() {
+        const info = {
+            company: {
+                name: "TryOnYou",
+                tagline: "Experience Virtual Try-On",
+                description: "Revolutionize your shopping experience with our cutting-edge virtual try-on technology. See how clothes, accessories, and more look on you before making a purchase.",
+                about: "We're pioneering the future of online retail with innovative virtual try-on solutions. Our technology helps customers make better purchasing decisions while reducing returns and increasing satisfaction.",
+                technology: "Powered by Ya-va Technology",
+                copyright: "© 2024 TryOnYou. All rights reserved."
+            },
+            contact: {
+                email: "hello@tryonyou.app",
+                website: "tryonyou.app"
+            },
+            features: [],
+            navigation: [],
+            content: {
+                sections: []
+            }
+        };
+
+        // Extract navigation items
+        const navLinks = document.querySelectorAll('.nav-links a');
+        navLinks.forEach(link => {
+            info.navigation.push({
+                text: link.textContent.trim(),
+                href: link.getAttribute('href'),
+                target: link.getAttribute('href').replace('#', '')
+            });
+        });
+
+        // Extract features
+        const featureElements = document.querySelectorAll('.feature');
+        featureElements.forEach(feature => {
+            const icon = feature.querySelector('.feature-icon')?.textContent.trim();
+            const title = feature.querySelector('h3')?.textContent.trim();
+            const description = feature.querySelector('p')?.textContent.trim();
+            
+            info.features.push({
+                icon: icon,
+                title: title,
+                description: description
+            });
+        });
+
+        // Extract all sections content
+        const sections = document.querySelectorAll('section[id]');
+        sections.forEach(section => {
+            const sectionId = section.getAttribute('id');
+            const heading = section.querySelector('h2')?.textContent.trim();
+            const paragraphs = Array.from(section.querySelectorAll('p')).map(p => p.textContent.trim());
+            const buttons = Array.from(section.querySelectorAll('button')).map(btn => btn.textContent.trim());
+            
+            info.content.sections.push({
+                id: sectionId,
+                heading: heading,
+                paragraphs: paragraphs,
+                buttons: buttons
+            });
+        });
+
+        return info;
+    }
+
+    // Make the function globally accessible
+    window.getAllWebsiteInfo = getAllWebsiteInfo;
+
+    // Display all info function
+    function displayAllInfo() {
+        const allInfo = getAllWebsiteInfo();
+        console.log('=== ALL WEBSITE INFORMATION ===');
+        console.log(JSON.stringify(allInfo, null, 2));
+        
+        // Create a formatted display
+        let infoDisplay = `
+=== TryOnYou Complete Information ===
+
+COMPANY INFORMATION:
+- Name: ${allInfo.company.name}
+- Tagline: ${allInfo.company.tagline}
+- Description: ${allInfo.company.description}
+- About: ${allInfo.company.about}
+- Technology: ${allInfo.company.technology}
+- Copyright: ${allInfo.company.copyright}
+
+CONTACT INFORMATION:
+- Email: ${allInfo.contact.email}
+- Website: ${allInfo.contact.website}
+
+NAVIGATION STRUCTURE:
+${allInfo.navigation.map(nav => `- ${nav.text} (${nav.href})`).join('\n')}
+
+FEATURES & BENEFITS:
+${allInfo.features.map(feature => `- ${feature.icon} ${feature.title}: ${feature.description}`).join('\n')}
+
+WEBSITE SECTIONS:
+${allInfo.content.sections.map(section => {
+    let sectionText = `\n[${section.id.toUpperCase()}]`;
+    if (section.heading) sectionText += `\nHeading: ${section.heading}`;
+    if (section.paragraphs.length) sectionText += `\nContent: ${section.paragraphs.join(' ')}`;
+    if (section.buttons.length) sectionText += `\nButtons: ${section.buttons.join(', ')}`;
+    return sectionText;
+}).join('\n')}
+        `;
+
+        // Create options for user
+        const choice = prompt(`Choose how to get the information:
+1. View formatted text (type 'text')
+2. Download as JSON file (type 'json')  
+3. Copy to clipboard (type 'copy')
+4. View in console (type 'console')
+
+Type your choice:`);
+
+        switch(choice?.toLowerCase()) {
+            case 'text':
+                alert(infoDisplay);
+                break;
+            case 'json':
+                downloadInfoAsJSON(allInfo);
+                break;
+            case 'copy':
+                copyToClipboard(infoDisplay);
+                break;
+            case 'console':
+            default:
+                console.log(infoDisplay);
+                alert('Information has been logged to the browser console (F12 → Console tab)');
+                break;
+        }
+        
+        return allInfo;
+    }
+
+    // Download information as JSON file
+    function downloadInfoAsJSON(info) {
+        const dataStr = JSON.stringify(info, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = 'tryonyou-website-info.json';
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        alert('Website information has been downloaded as JSON file!');
+    }
+
+    // Copy to clipboard function
+    function copyToClipboard(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Information copied to clipboard!');
+            }).catch(() => {
+                fallbackCopyTextToClipboard(text);
+            });
+        } else {
+            fallbackCopyTextToClipboard(text);
+        }
+    }
+
+    // Fallback copy function for older browsers
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            alert('Information copied to clipboard!');
+        } catch (err) {
+            alert('Unable to copy to clipboard. Information is available in the console.');
+            console.log(text);
+        }
+        
+        document.body.removeChild(textArea);
+    }
+
+    // Make display function globally accessible
+    window.displayAllInfo = displayAllInfo;
+
+    // Add keyboard shortcut to extract info (Ctrl+I or Cmd+I)
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+            e.preventDefault();
+            displayAllInfo();
+        }
+    });
 });
 
 // Add CSS for active nav links
