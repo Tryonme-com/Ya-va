@@ -96,9 +96,11 @@ main {
 .cta-buttons {
     display: flex;
     gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary, .btn-secondary, .btn-info {
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
@@ -128,6 +130,27 @@ main {
     background: #667eea;
     color: white;
     transform: translateY(-2px);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.btn-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+}
+
+@media (max-width: 768px) {
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-info {
+        width: 200px;
+    }
 }
 
 .hero-image {
